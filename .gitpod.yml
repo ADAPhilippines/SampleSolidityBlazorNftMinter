@@ -4,4 +4,3 @@
 
 tasks:
   - init: npm install
-image: gitpod/workspace-dotnet:latest
