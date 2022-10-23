@@ -22,6 +22,7 @@ public partial class NftMinter
         if (OnChainService is not null)
         {
             WalletAddress = await OnChainService.ConnectWalletAsync();
+            Balance = (await OnChainService.GetBalance()).ToString();
             await InvokeAsync(StateHasChanged);
         }
     }
