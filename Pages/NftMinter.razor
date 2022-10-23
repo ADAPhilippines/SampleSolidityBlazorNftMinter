@@ -1,0 +1,21 @@
+﻿@page "/nft"
+
+<PageTitle>NFT Minting Dashboard</PageTitle>
+
+@if (string.IsNullOrEmpty(WalletAddress))
+{
+    <div style="display: flex; flex-direction: row;">
+        <button @onclick=OnBtnConnectWalletClicked>Connect Wallet</button>
+    </div>
+}
+else
+{
+    <div>
+        <b>Address:</b>
+        <span>@WalletAddress</span>
+    </div>
+    <div>
+        <b>Balance:</b>
+        <span>@Balance</span>
+    </div>
+}
