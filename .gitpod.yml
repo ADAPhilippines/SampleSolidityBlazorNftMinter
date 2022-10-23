@@ -3,6 +3,12 @@
 # and commit this file to your remote git repository to share the goodness with others.
 
 tasks:
-  - init: npm install
+  - init: |
+      dotnet restore
+      dotnet build
+      npm install
 image:
   file: .gitpod.Dockerfile
+vscode:
+  extensions:
+    - muhammad-sammy.csharp
