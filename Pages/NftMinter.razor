@@ -1,11 +1,12 @@
 ﻿@page "/nft"
+@using nft_minter.Models
 
 <PageTitle>NFT Minting Dashboard</PageTitle>
 
 @if (string.IsNullOrEmpty(WalletAddress))
 {
     <div style="display: flex; flex-direction: row;">
-        <button @onclick=OnBtnConnectWalletClicked>Connect Wallet</button>
+        <button @onclick="OnBtnConnectWalletClicked">Connect Wallet</button>
     </div>
 }
 else
@@ -17,5 +18,24 @@ else
     <div>
         <b>Balance:</b>
         <span>@Balance</span>
+    </div>
+    <div style="display: flex; flex-direction: row; gap: 5px;">
+        <b>Minter Contract: </b>
+        <input type="text" @bind-value="MinterAddress" />
+        <button @onclick="OnBtnMintNftClicked">Mint Nft</button>
+        <button @onclick="() => RefreshNftsAsync()">Refresh Nfts</button>
+    </div>
+
+    <div style="display: grid; column-gap: 50px; row-gap: 50px; margin-top: 10px; grid-template-columns: repeat(3, 1fr);">
+        @foreach (NFT nft in NFTs)
+        {
+            <div style="border: 1px solid black; display: flex; flex-direction: column; text-align: center;">
+                <a target="_blank" href="https://explorer-devnet-cardano-evm.c1.milkomeda.com/token/@NFTContractAddress/instance/@(Convert.ToInt32(nft.TokenId, 16))/token-transfers">
+                    <img src="@nft.Image" alt="@nft.TokenId" style="width: 100%;" />
+                </a>
+                <span>@nft.Name</span>
+                <span>@nft.Description</span>
+            </div>
+        }
     </div>
 }

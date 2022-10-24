@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using nft_minter.Services;
+using nft_minter.Models;
 
 namespace nft_minter.Pages;
 
@@ -10,19 +11,27 @@ public partial class NftMinter
 
     protected string WalletAddress { get; set; } = string.Empty;
     protected string Balance { get; set; } = "0";
-    protected string Name { get; set; } = "Clark";
-
-    protected void Test()
-    {
-        Name = "Hello World";
-    }
+    protected string MinterAddress { get; set; } = string.Empty;
+    protected string NFTContractAddress { get; set; } = string.Empty;
+    protected IEnumerable<NFT> NFTs { get; set; } = new List<NFT>();
 
     protected async Task OnBtnConnectWalletClicked()
     {
         if (OnChainService is not null)
         {
             WalletAddress = await OnChainService.ConnectWalletAsync();
-            Balance = (await OnChainService.GetBalance()).ToString();
+            Balance = (await OnChainService.GetBalanceAsync()).ToString();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    protected async Task OnBtnMintNftClicked()
+    {
+        if (OnChainService is not null)
+        {
+            await OnChainService.MintNftAsync(MinterAddress);
+            Balance = (await OnChainService.GetBalanceAsync()).ToString();
+            await RefreshNftsAsync();
             await InvokeAsync(StateHasChanged);
         }
     }
@@ -37,8 +46,9 @@ public partial class NftMinter
             {
                 try
                 {
-                    WalletAddress = await OnChainService.GetAddress();
-                    Balance = (await OnChainService.GetBalance()).ToString();
+                    WalletAddress = await OnChainService.GetAddressAsync();
+                    Balance = (await OnChainService.GetBalanceAsync()).ToString();
+                    await RefreshNftsAsync();
                     await InvokeAsync(StateHasChanged);
                 }
                 catch (Exception ex)
@@ -47,5 +57,32 @@ public partial class NftMinter
                 }
             }
         }
+    }
+
+    protected async Task RefreshNftsAsync()
+    {
+        try
+        {
+            if (OnChainService is not null &&
+                !string.IsNullOrWhiteSpace(MinterAddress) &&
+                !string.IsNullOrEmpty(MinterAddress))
+            {
+                NFTs = await OnChainService.GetNftsAsync(MinterAddress);
+                await RefreshNFTContractAddressAsync();
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    protected async Task RefreshNFTContractAddressAsync()
+    {
+        if (OnChainService is not null &&
+            !string.IsNullOrWhiteSpace(MinterAddress) &&
+            !string.IsNullOrEmpty(MinterAddress)
+        ) NFTContractAddress = await OnChainService.GetNFTContractAddressAsync(MinterAddress);
     }
 }
